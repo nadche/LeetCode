@@ -240,10 +240,55 @@ namespace Searcha2DMatrix {
     }
 };
 //875. Koko Eating Bananas
-//namespace KokoEatingBananas {
-//    int mineatingspeed(std::vector<int>& piles, int h) {
-//    }
-// };
+namespace KokoEatingBananas {
+    inline int maxpile(std::vector<int>& piles)
+    {
+            int max = piles[0];
+            for (int pile : piles)
+            {
+                if (pile > max)
+                    max = pile;
+            }
+            return max;
+    };
+    int minEatingSpeed(std::vector<int>& piles, int h) {
+        int n = piles.size();
+
+        int low = 1;
+        int high = 0;
+        for (int i = 0; i < n; i++) {
+            high = std::max(high, piles[i]);
+        }
+
+        int result = high;
+
+        while (low <= high) {
+            int k = low + (high - low) / 2;
+            long int hours = 0;
+            for (int i = 0; i < n; i++) {
+                hours += std::ceil((double)piles[i] / k);
+            }
+            if (hours <= h) {
+                result = std::min(result, k);
+                high = k - 1;
+            }
+            else {
+                low = k + 1;
+            }
+        }
+
+        return result;
+    }
+    void print(int out) {
+        std::cout << out << "\n";
+    }
+
+    void example() {
+        std::vector<int> in = { 30,11,23,4,20 }; int h = 6;
+        print(minEatingSpeed(in, h));
+    }
+
+ };
 
 int main(){
     GroupAnagrams::example();
@@ -252,5 +297,6 @@ int main(){
     SearchInRotatedSortedArray::example();
     Searcha2DMatrix::example();
     BinarySpace::example();
+    KokoEatingBananas::example();
     return 0;
 }
