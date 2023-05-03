@@ -5,6 +5,9 @@
 #include <unordered_map>
 #include <queue>
 #include <math.h>
+#include <string>
+#include <stack>
+#include <memory>
 
 // 49. Group Anagrams
 namespace GroupAnagrams {
@@ -289,14 +292,151 @@ namespace KokoEatingBananas {
     }
 
  };
+//124. Binary Tree Maximum Path Sum
+    struct TreeNode {
+        int val;
+        TreeNode* left;
+        TreeNode* right;
+        TreeNode(): val(0), left(nullptr), right(nullptr){}
+        TreeNode(int x): val(x), left(nullptr), right(nullptr) {}
+        TreeNode(int x, TreeNode* left, TreeNode* right):val(x), left(left), right(right) {}
+    };
+namespace BinaryTreeMaximumPathSum {
+    std::pair<int,int> dfs(TreeNode* node)  
+    {
+        if ((node->left->left == nullptr) && (node->left->right == nullptr)
+            && (node->right->left == nullptr) && (node->right->right == nullptr))
+            return std::make_pair(node->left->val + node->right->val + node->val, 
+                node->val + (node->left->val > node->right->val ? node->left->val : node->right->val));
+        auto left = dfs(node->left);
+        auto right = dfs(node->right);
+        int childPath = (left.first > right.first ? left.first : right.first);
+        int newPath = left.second + node->val + right.second;
+        return std::make_pair(std::max(childPath, newPath),
+            node->val + (left.second > right.second ? left.second : right.second));
 
+    }
+    int maxPathSum(TreeNode* root) {
+        auto res = dfs(root);
+        return std::max(res.first, res.second);
+    }
+    void print(int out) {
+        std::cout << out << "\n";
+    }
+
+    void example() {
+        std::vector<int> in = { -10,9,20,0,0,15,7 };
+        TreeNode node7 = TreeNode(7);
+        TreeNode node6 = TreeNode(15);
+        TreeNode node5 = TreeNode();
+        TreeNode node4 = TreeNode();
+        TreeNode node3 = TreeNode(20, &node6, &node7);
+        TreeNode node2 = TreeNode(9, &node4, &node5);
+        TreeNode root = TreeNode(-10, &node2, &node3);
+        print(maxPathSum(&root));
+    }
+    
+}
+//297. Serialize and Deserialize Binary Tree
+namespace Codec {
+    // Encodes a tree to a single string.
+    std::string serialize(TreeNode* root) {
+        std::string temp = "";
+        if (root)
+        {
+            temp += "(";
+            temp += std::to_string(root->val);
+            temp += serialize(root->left);
+            temp += serialize(root->right);
+            temp += ")";
+        }
+        else
+            temp += "()";
+        return temp;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(std::string data) {
+        std::stack<char> stack;
+        std::string temp = "";
+        std::vector<TreeNode*> tree;
+        stack.push('(');
+        for (int i = 1; !stack.empty(); i++)
+        {
+            if (data[i] == '(')
+            {
+                stack.push('(');
+                TreeNode* node = new TreeNode(std::stoi(temp));
+                tree.push_back(node);
+                temp.clear();
+            }
+            else if (data[i] == ')')
+            {
+                stack.pop();
+            }
+            else
+                temp += data[i];
+        }
+        TreeNode* node = new TreeNode(std::stoi(temp));
+        tree.push_back(node);
+        temp.clear();
+
+        for (int i = 0; i < (int)((float)tree.size() / 2); i++)
+        {
+            tree[i]->left = tree[2 * i + 1];
+            tree[i]->right = tree[2 * i + 2];
+        }
+        return tree[0];
+    }
+
+    void print(std::vector<int> to_serialize, std::string serialized) {
+        std::cout << "_____________________________________________\n";
+        for (auto v : to_serialize)
+        {
+            std::cout << v << " ";
+        }
+        std::cout << serialized << "\n";
+    }
+    void printDeserialize(TreeNode* root, std::string str)
+    {
+        std::stack<TreeNode*> stack;
+        std::cout << root->val << " ";
+        stack.push(root);
+        while (!stack.empty())
+        {
+            TreeNode* node = stack.top();
+            stack.pop();
+            std::cout << node->val<< " ";
+            if (!node->left)
+                stack.push(node->left);
+            if (!node->right)
+                stack.push(node->right);
+        }
+        std::cout << str << "\n";
+    }
+
+    void example() {
+        TreeNode node7 = TreeNode(7);
+        TreeNode node6 = TreeNode(15);
+        TreeNode node5 = TreeNode();
+        TreeNode node4 = TreeNode();
+        TreeNode node3 = TreeNode(20, &node6, &node7);
+        TreeNode node2 = TreeNode(9, &node4, &node5);
+        TreeNode root = TreeNode(-10, &node2, &node3);
+        std::vector<int> in = { -10,9,20,0,0,15,7 };
+        print(in, serialize(&root));
+        printDeserialize(deserialize(serialize(&root)), (serialize(&root)));
+
+    }
+}
 int main(){
-    GroupAnagrams::example();
+    /*GroupAnagrams::example();
     TopKFrequent::example();
     ProductExceptSelf::example();
     SearchInRotatedSortedArray::example();
     Searcha2DMatrix::example();
     BinarySpace::example();
     KokoEatingBananas::example();
-    return 0;
+    BinaryTreeMaximumPathSum::example();*/
+    Codec::example();
 }
