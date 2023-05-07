@@ -675,14 +675,26 @@ namespace ValidateBST {
         if (root == nullptr) return true;
         if (((root->left == nullptr) || (root->left->val < root->val))
             && ((root->right == nullptr) || (root->right->val > root->val)))
-            return (isValidBST_Wrong(root->left) && isValidBST_Wrong(root->right));
+            return (isValidBST_Wrong(root->left)
+                && isValidBST_Wrong(root->right));
         return false;
+    }
+    bool foo(TreeNode* node, long leftBound, long rightBound) {
+        if (node == nullptr) return true;
+        if ((node->val < rightBound) && (node->val > leftBound))
+            return foo(node->left, leftBound, node->val) && foo(node->right, node->val, rightBound);
+        return false;
+    }
+    bool isValidBST(TreeNode* root) {
+        if (root == nullptr) return true;
+        return foo(root,0x80000000, 0x7FFFFFFF);
+
     }
     void print(bool out) {
         std::cout << (out?"true":"false") << "\n";
     }
     void example() {
-        std::vector<int> in = { 5,4,6,-1,-1,3,7 };
+        std::vector<int> in = { 98,-57,-1,-1,58,-1,-1,-1,-1,31 };
         std::vector<TreeNode*> inNodes(in.size(), nullptr);
         for (int i = 0; i < in.size(); i++)
             if (in[i] != -1)
@@ -697,9 +709,50 @@ namespace ValidateBST {
                     inNodes[i]->right = inNodes[2 * i + 2];
             }
         }
-        print(isValidBST_Wrong(inNodes[0]));
+        print(isValidBST(inNodes[0]));
     }
 }
+//230. Kth Smallest Element in a BST
+namespace BSTKthSmallestElement {
+    void checkLeft(TreeNode* node, int& k, int& val) {
+       if (!node) return;
+       checkLeft(node->left, k, val);
+       --k;
+       if (k == 0) {
+           val = node->val;
+           return;
+       }
+       checkLeft(node->right, k, val);
+
+    }
+    int kthSmallest(TreeNode* root, int k) {
+        int val = 0;
+        checkLeft(root, k, val);
+        return val;
+    }
+    void print(int out) {
+        std::cout << out << "\n";
+    }
+    void example() {
+        std::vector<int> in = { 5,3,6,2,4,-1,-1,1 };
+        std::vector<TreeNode*> inNodes(in.size(), nullptr);
+        for (int i = 0; i < in.size(); i++)
+            if (in[i] != -1)
+                inNodes[i] = new TreeNode(in[i]);
+        for (int i = 0; i < (int)(inNodes.size() / 2); i++)
+        {
+            if (inNodes[i] != nullptr)
+            {
+                if ((2 * i + 1) < in.size())
+                    inNodes[i]->left = inNodes[2 * i + 1];
+                if ((2 * i + 2) < in.size())
+                    inNodes[i]->right = inNodes[2 * i + 2];
+            }
+        }
+        print(kthSmallest(inNodes[0],3));
+    }
+}
+
 int main(){
     /*GroupAnagrams::example();
     TopKFrequent::example();
@@ -713,6 +766,7 @@ int main(){
     LCAinBST::example();
     BinaryTreeLevelOrderTraversal::example();
     BinaryTreeRightSideView::example();
-    BinaryTreeCountGoodNodes::example();*/
-    ValidateBST::example();
+    BinaryTreeCountGoodNodes::example();
+    ValidateBST::example();*/
+    BSTKthSmallestElement::example();
 }
