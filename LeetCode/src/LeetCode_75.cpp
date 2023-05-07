@@ -8,7 +8,7 @@
 #include <string>
 #include <stack>
 #include <memory>
-
+#include <sstream>
 // 49. Group Anagrams
 namespace GroupAnagrams {
     std::vector<std::vector<std::string>> groupAnagrams(std::vector<std::string>& strs){
@@ -339,56 +339,47 @@ namespace BinaryTreeMaximumPathSum {
 }
 //297. Serialize and Deserialize Binary Tree
 namespace Codec {
-    // Encodes a tree to a single string.
-    std::string serialize(TreeNode* root) {
-        std::string temp = "";
-        if (root)
-        {
-            temp += "(";
-            temp += std::to_string(root->val);
-            temp += serialize(root->left);
-            temp += serialize(root->right);
-            temp += ")";
-        }
-        else
-            temp += "()";
-        return temp;
-    }
 
-    // Decodes your encoded data to tree.
-    TreeNode* deserialize(std::string data) {
-        std::stack<char> stack;
-        std::string temp = "";
-        std::vector<TreeNode*> tree;
-        stack.push('(');
-        for (int i = 1; !stack.empty(); i++)
-        {
-            if (data[i] == '(')
-            {
-                stack.push('(');
-                TreeNode* node = new TreeNode(std::stoi(temp));
-                tree.push_back(node);
-                temp.clear();
+        void encode(TreeNode* root, std::ostringstream& out) {
+            if (root == NULL) {
+                out << "N ";
+                return;
             }
-            else if (data[i] == ')')
-            {
-                stack.pop();
+
+            out << root->val << " ";
+
+            encode(root->left, out);
+            encode(root->right, out);
+        }
+
+        TreeNode* decode(std::istringstream& in) {
+            std::string value = "";
+            in >> value;
+
+            if (value == "N") {
+                return NULL;
             }
-            else
-                temp += data[i];
-        }
-        TreeNode* node = new TreeNode(std::stoi(temp));
-        tree.push_back(node);
-        temp.clear();
 
-        for (int i = 0; i < (int)((float)tree.size() / 2); i++)
-        {
-            tree[i]->left = tree[2 * i + 1];
-            tree[i]->right = tree[2 * i + 2];
-        }
-        return tree[0];
-    }
+            TreeNode* root = new TreeNode(stoi(value));
 
+            root->left = decode(in);
+            root->right = decode(in);
+
+            return root;
+        }
+
+        // Encodes a tree to a single string.
+        std::string serialize(TreeNode* root) {
+            std::ostringstream out;
+            encode(root, out);
+            return out.str();
+        }
+
+        // Decodes your encoded data to tree.
+        TreeNode* deserialize(std::string data) {
+            std::istringstream in(data);
+            return decode(in);
+        }
     void print(std::vector<int> to_serialize, std::string serialized) {
         std::cout << "_____________________________________________\n";
         for (auto v : to_serialize)
@@ -400,7 +391,6 @@ namespace Codec {
     void printDeserialize(TreeNode* root, std::string str)
     {
         std::stack<TreeNode*> stack;
-        std::cout << root->val << " ";
         stack.push(root);
         while (!stack.empty())
         {
@@ -429,6 +419,287 @@ namespace Codec {
 
     }
 }
+//212. Word Search II
+//namespace WordSearch {
+//    class TrieNode {
+//        std::string parent;
+//        std::
+//    };
+//}
+//235. Lowest Common Ancestor of a Binary Search Tree
+namespace LCAinBST {
+    //Best Solution
+    TreeNode* lowestCommonAncestor2(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (p->val < root->val && q->val < root->val) {
+            return lowestCommonAncestor2(root->left, p, q);
+        }
+        else if (p->val > root->val && q->val > root->val) {
+            return lowestCommonAncestor2(root->right, p, q);
+        }
+        else {
+            return root;
+        }
+    }
+    //MySolution
+    TreeNode* binarySearch(TreeNode* parent, int val, std::vector<TreeNode*>& path) {
+        path.push_back(parent);
+        if (val == parent->val) return parent;
+        if (val < parent->val)
+            binarySearch(parent->left, val, path);
+        else if (val > parent->val)
+            binarySearch(parent->right, val, path);
+        else
+            return nullptr;
+    }
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        std::vector<TreeNode*> pathp;
+        binarySearch(root, p->val, pathp);
+        std::vector<TreeNode*> pathq;
+        binarySearch(root, q->val, pathq);
+        int pathLength = std::min(pathq.size(), pathp.size());
+        TreeNode* common = root;
+        for (int i = 0; i < pathLength; i++) {
+            if (pathp[i] == pathq[i]) common = pathp[i];
+        }
+        return common;
+    }
+    void print(TreeNode* out) {
+        std::cout << out->val << "\n";
+    }
+
+    void example() {
+        std::vector<int> in = { 2,1 };
+        int p = 2; 
+        int q = 1;
+        std::vector<TreeNode*> inNodes;
+        inNodes.resize(in.size());
+        int pIdx, qIdx;
+        for (int i = 0; i < in.size(); i++)
+        {
+            inNodes[i] = new TreeNode(in[i]);
+            if (inNodes[i]->val == p)
+                pIdx = i;
+            if (inNodes[i]->val == q)
+                qIdx = i;
+        }
+        for (int i = 0; i < (int)(in.size()/2); i++)
+        {
+            if ((2 * i + 1) < in.size())
+                inNodes[i]->left = inNodes[2 * i + 1];
+            if ((2 * i + 2) < in.size())
+                inNodes[i]->right = inNodes[2 * i + 2];
+        }
+        print(lowestCommonAncestor(inNodes[0], inNodes[pIdx], inNodes[qIdx]));
+        print(lowestCommonAncestor2(inNodes[0], inNodes[pIdx], inNodes[qIdx]));
+    }
+}
+//102. Binary Tree Level Order Traversal
+namespace BinaryTreeLevelOrderTraversal {
+    std::vector<std::vector<int>> levelOrder(TreeNode* root) {
+        std::vector<std::vector<int>> result;
+
+        if (root == nullptr) return result;
+        std::queue<TreeNode*> q;
+        q.push(root);
+        while (!q.empty())
+        {
+            int n = (int)q.size();
+            std::vector<int> currentLevel;
+            for (int i = 0; i < n; i++) {
+                TreeNode* node = q.front();
+                q.pop();
+
+                currentLevel.push_back(node->val);
+
+                if (node->left != nullptr)
+                    q.push(node->left);
+                if (node->right != nullptr)
+                    q.push(node->right);
+            }
+            result.push_back(currentLevel);
+        }
+        return result;
+    }
+    void print(const std::vector<std::vector<int>>& out) {
+        std::cout << "[";
+        for (int i = 0; i < out.size(); i++)
+        {
+            std::cout << "[";
+            for (int j = 0; j < out[i].size(); j++)
+            {
+                std::cout << out[i][j] << " ";
+            }
+            std::cout << "]";
+        }
+        std::cout << "]\n";
+    }
+
+    void example() {
+        std::vector<int> in = { 3,9,20,-1,-1,15,7 };
+        std::vector<TreeNode*> inNodes(in.size(), nullptr);
+        for (int i = 0; i < in.size(); i++)
+            if (in[i] != -1)
+                inNodes[i] = new TreeNode(in[i]);
+        for (int i = 0; i < (int)(in.size() / 2); i++)
+        {
+            if ((2 * i + 1) < in.size())
+                inNodes[i]->left = inNodes[2 * i + 1];
+            if ((2 * i + 2) < in.size())
+                inNodes[i]->right = inNodes[2 * i + 2];
+        }
+        print(levelOrder(inNodes[0]));
+    }
+}
+//199. Binary Tree Right Side View
+namespace BinaryTreeRightSideView {
+    //return the branch on the right side, if that branch is shorter than other branches of the tree, it is supposed to return the
+    //node most to the right from other branches. 
+    std::vector<int> rightSideView_Wrong(TreeNode* root) {
+        std::vector<int> result;
+        if (root == nullptr) return result;
+        result.push_back(root->val);
+        TreeNode* node = root;
+        while (node->right || node->left)
+        {
+            if (node->right != nullptr)
+            {
+                result.push_back(node->right->val);
+                node = node->right;
+            }
+            else
+            {
+                result.push_back(node->left->val);
+                node = node->left;
+            }
+        }
+        return result;
+    }
+    std::vector<int> rightSideView(TreeNode* root) {
+        std::vector<int> result;
+        if (root == nullptr) return result;
+        
+        std::queue<TreeNode*> q;
+        q.push(root);
+
+        while (!q.empty())
+        {
+            int n = (int)q.size();
+            for (int i = 0; i < n; i++)
+            {
+                TreeNode* node = q.front();
+                q.pop();
+
+                if (node->right != nullptr)
+                    q.push(node->right);
+                if (node->left != nullptr)
+                    q.push(node->left);
+
+                if (i == 0)
+                    result.push_back(node->val);
+            }
+        }
+        return result;
+    }
+    void print(const std::vector<int>& out) {
+        std::cout << "[";
+        for (int j = 0; j < out.size(); j++)
+        {
+            std::cout << out[j] << " ";
+        }
+        std::cout << "]";
+    }
+
+    void example() {
+        std::vector<int> in = {1,2,3,4};
+        std::vector<TreeNode*> inNodes(in.size(), nullptr);
+        for (int i = 0; i < in.size(); i++)
+            if (in[i] != -1)
+                inNodes[i] = new TreeNode(in[i]);
+        for (int i = 0; i < (int)(in.size() / 2); i++)
+        {
+            if ((2 * i + 1) < in.size())
+                inNodes[i]->left = inNodes[2 * i + 1];
+            if ((2 * i + 2) < in.size())
+                inNodes[i]->right = inNodes[2 * i + 2];
+        }
+        print(rightSideView(inNodes[0]));
+    }
+}
+//1448. Count Good Nodes in Binary Tree
+namespace BinaryTreeCountGoodNodes {
+    void dfs(TreeNode* node, int max, int& count) {
+        if (node == nullptr) return;
+        if (node->val >= max) 
+        {
+            count++;
+            max = node->val;
+        }
+        dfs(node->left, max, count);
+        dfs(node->right, max, count);
+    }
+
+    int goodNodes(TreeNode* root)
+    {
+        int count = 0;
+        dfs(root, root->val, count);
+        return count;
+    }
+    void print(int out) {
+        std::cout << out << "\n";
+    }
+
+    void example() {
+        std::vector<int> in = { 3,1,4,3,-1,1,5 };
+        std::vector<TreeNode*> inNodes(in.size(), nullptr);
+        for (int i = 0; i < in.size(); i++)
+            if (in[i] != -1)
+                inNodes[i] = new TreeNode(in[i]);
+        for (int i = 0; i < (int)(inNodes.size() / 2); i++)
+        {
+            if (inNodes[i] != nullptr)
+            {
+                if ((2 * i + 1) < in.size())
+                    inNodes[i]->left = inNodes[2 * i + 1];
+                if ((2 * i + 2) < in.size())
+                    inNodes[i]->right = inNodes[2 * i + 2];
+            }
+        }
+        print(goodNodes(inNodes[0]));
+    }
+}
+//98. Validate Binary Search Tree
+namespace ValidateBST {
+    //Although it fits the definition of the bst given by the leetcode challenge, it doesn't fit the definition of a BST,
+    //where for example the left node should be smaller than its parent BUT ALSO PARENT NODE OF ITS PARENT
+    bool isValidBST_Wrong(TreeNode* root) {
+        if (root == nullptr) return true;
+        if (((root->left == nullptr) || (root->left->val < root->val))
+            && ((root->right == nullptr) || (root->right->val > root->val)))
+            return (isValidBST_Wrong(root->left) && isValidBST_Wrong(root->right));
+        return false;
+    }
+    void print(bool out) {
+        std::cout << (out?"true":"false") << "\n";
+    }
+    void example() {
+        std::vector<int> in = { 5,4,6,-1,-1,3,7 };
+        std::vector<TreeNode*> inNodes(in.size(), nullptr);
+        for (int i = 0; i < in.size(); i++)
+            if (in[i] != -1)
+                inNodes[i] = new TreeNode(in[i]);
+        for (int i = 0; i < (int)(inNodes.size() / 2); i++)
+        {
+            if (inNodes[i] != nullptr)
+            {
+                if ((2 * i + 1) < in.size())
+                    inNodes[i]->left = inNodes[2 * i + 1];
+                if ((2 * i + 2) < in.size())
+                    inNodes[i]->right = inNodes[2 * i + 2];
+            }
+        }
+        print(isValidBST_Wrong(inNodes[0]));
+    }
+}
 int main(){
     /*GroupAnagrams::example();
     TopKFrequent::example();
@@ -437,6 +708,11 @@ int main(){
     Searcha2DMatrix::example();
     BinarySpace::example();
     KokoEatingBananas::example();
-    BinaryTreeMaximumPathSum::example();*/
+    BinaryTreeMaximumPathSum::example();
     Codec::example();
+    LCAinBST::example();
+    BinaryTreeLevelOrderTraversal::example();
+    BinaryTreeRightSideView::example();
+    BinaryTreeCountGoodNodes::example();*/
+    ValidateBST::example();
 }
