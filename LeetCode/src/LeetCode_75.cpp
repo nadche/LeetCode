@@ -754,7 +754,7 @@ namespace BSTKthSmallestElement {
 }
 
 int main(){
-    /*GroupAnagrams::example();
+    GroupAnagrams::example();
     TopKFrequent::example();
     ProductExceptSelf::example();
     SearchInRotatedSortedArray::example();
@@ -767,6 +767,6 @@ int main(){
     BinaryTreeLevelOrderTraversal::example();
     BinaryTreeRightSideView::example();
     BinaryTreeCountGoodNodes::example();
-    ValidateBST::example();*/
+    ValidateBST::example();
     BSTKthSmallestElement::example();
 }
