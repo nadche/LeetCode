@@ -752,9 +752,45 @@ namespace BSTKthSmallestElement {
         print(kthSmallest(inNodes[0],3));
     }
 }
+//78. Subsets
+namespace Subsets {
 
+    void dfs(std::vector<std::vector<int>>& result, int start, std::vector<int>& l, std::vector<int>& nums)
+    {
+        result.push_back(l);
+        for (int i = start; i < nums.size(); i++) {
+            l.push_back(nums[i]);
+            dfs(result, i + 1, l, nums);
+            l.pop_back();
+        }
+    }
+    std::vector<std::vector<int>> subsets(std::vector<int>& nums) {
+        std::vector<std::vector<int>> result;
+        std::vector<int> l;
+        dfs(result, 0, l, nums);
+        return result;
+    }
+    void print(const std::vector<std::vector<int>>& out) {
+        std::cout << "[";
+        for (int i = 0; i < out.size(); i++)
+        {
+            std::cout << "[";
+            for (int j = 0; j < out[i].size(); j++)
+            {
+                std::cout << out[i][j] << " ";
+            }
+            std::cout << "]";
+        }
+        std::cout << "]\n";
+    }
+
+    void example() {
+        std::vector<int> in = { 1,2,3 };
+        print(subsets(in));
+    }
+}
 int main(){
-    GroupAnagrams::example();
+    /*GroupAnagrams::example();
     TopKFrequent::example();
     ProductExceptSelf::example();
     SearchInRotatedSortedArray::example();
@@ -768,5 +804,6 @@ int main(){
     BinaryTreeRightSideView::example();
     BinaryTreeCountGoodNodes::example();
     ValidateBST::example();
-    BSTKthSmallestElement::example();
+    BSTKthSmallestElement::example();*/
+    Subsets::example();
 }
