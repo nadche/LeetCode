@@ -753,7 +753,7 @@ namespace BSTKthSmallestElement {
     }
 }
 //78. Subsets
-namespace Subsets {
+namespace BacktrackingSubsets {
 
     void dfs(std::vector<std::vector<int>>& result, int start, std::vector<int>& l, std::vector<int>& nums)
     {
@@ -789,6 +789,89 @@ namespace Subsets {
         print(subsets(in));
     }
 }
+//39. Combination Sum
+namespace BacktrackingCombinationSum {
+    void dfs(std::vector<int>& candidates, int target, int sum, int start, std::vector<int>& l, std::vector<std::vector<int>>& result)
+    {
+        if (sum > target) return;
+        if (sum == target) {
+            result.push_back(l);
+            return;
+        }
+        for (int i = start; i < candidates.size(); i++) {
+            l.push_back(candidates[i]);
+            dfs(candidates, target, sum + candidates[i], i, l, result);
+            l.pop_back();
+        }
+    }
+    std::vector<std::vector<int>> combinationSum(std::vector<int>& candidates, int target)
+    {
+        std::sort(candidates.begin(), candidates.end());
+        std::vector<int> l;
+        std::vector<std::vector<int>> result;
+        dfs(candidates, target, 0, 0, l, result);
+        return result;
+    }
+    void print(const std::vector<std::vector<int>>& out) {
+        std::cout << "[";
+        for (int i = 0; i < out.size(); i++)
+        {
+            std::cout << "[";
+            for (int j = 0; j < out[i].size(); j++)
+            {
+                std::cout << out[i][j] << " ";
+            }
+            std::cout << "]";
+        }
+        std::cout << "]\n";
+    }
+    void example() {
+        std::vector<int> in = { 2,3,6,7 };
+        int target = 7;
+        print(combinationSum(in, target));
+    }
+}
+//46. Permutations
+namespace BacktrackingPermutations {
+    
+    void dfs(std::vector<std::vector<int>>& result, int start, std::vector<int>& nums) {
+        if (start == nums.size()) {
+            result.push_back(nums);
+            return;
+        }
+
+        for (int i = start; i < nums.size(); i++) {
+            std::swap(nums[i], nums[start]);
+            dfs(result, start + 1, nums);
+            std::swap(nums[i], nums[start]);
+        }
+    }
+
+    std::vector<std::vector<int>> permute(std::vector<int>& nums) {
+        std::vector<std::vector<int>> result;
+        dfs(result, 0, nums);
+        return result;
+    }
+    
+    void print(const std::vector<std::vector<int>>& out) {
+        std::cout << "[";
+        for (int i = 0; i < out.size(); i++)
+        {
+            std::cout << "[";
+            for (int j = 0; j < out[i].size(); j++)
+            {
+                std::cout << out[i][j] << " ";
+            }
+            std::cout << "]";
+        }
+        std::cout << "]\n";
+    }
+
+    void example() {
+        std::vector<int> in = { 1 };
+        print(permute(in));
+    }
+}
 int main(){
     /*GroupAnagrams::example();
     TopKFrequent::example();
@@ -804,6 +887,8 @@ int main(){
     BinaryTreeRightSideView::example();
     BinaryTreeCountGoodNodes::example();
     ValidateBST::example();
-    BSTKthSmallestElement::example();*/
-    Subsets::example();
+    BSTKthSmallestElement::example();
+    BacktrackingSubsets::example();
+    BacktrackingCombinationSum::example();*/
+    BacktrackingPermutations::example();
 }
