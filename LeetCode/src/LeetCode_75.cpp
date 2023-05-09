@@ -872,6 +872,207 @@ namespace BacktrackingPermutations {
         print(permute(in));
     }
 }
+//90. Subsets II
+namespace BacktrackingSubsets2 {
+    void dfs(std::vector<std::vector<int>>& result, int start, std::vector<int>& curr, std::vector<int>& nums) {
+            result.push_back(curr);
+        for (int i = start; i < nums.size(); i++) {
+            if (i > start && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            curr.push_back(nums[i]);
+            dfs(result, i + 1, curr, nums);
+            curr.pop_back();
+        }
+    }
+
+    std::vector<std::vector<int>> subsetsWithDup(std::vector<int>& nums) {
+        std::sort(nums.begin(), nums.end());
+
+        std::vector<std::vector<int>> result;
+        std::vector<int> curr;
+        
+        dfs(result, 0, curr, nums);
+        return result;
+    }
+    void print(const std::vector<std::vector<int>>& out) {
+        std::cout << "[";
+        for (int i = 0; i < out.size(); i++)
+        {
+            std::cout << "[";
+            for (int j = 0; j < out[i].size(); j++)
+            {
+                std::cout << out[i][j] << " ";
+            }
+            std::cout << "]";
+        }
+        std::cout << "]\n";
+    }
+
+    void example() {
+        std::vector<int> in = { 1,2,2 };
+        print(subsetsWithDup(in));
+    }
+}
+//40. Combination Sum II
+namespace BacktrackingCombinationSum2 {
+    void dfs(std::vector<std::vector<int>>& result, int start, int target, std::vector<int>& curr ,std::vector<int>& candidates) {
+        if (target < 0)
+            return;
+        if (target == 0)
+        {
+            result.push_back(curr);
+            return;
+        }
+        for (int i = start; i < candidates.size(); i++)
+        {
+            if ((i > start) && (candidates[i] == candidates[i - 1]))
+                continue;
+            curr.push_back(candidates[i]);
+            dfs(result, i + 1, target - candidates[i], curr, candidates);
+            curr.pop_back();
+        }
+    }
+    std::vector<std::vector<int>> combinationSum2(std::vector<int>& candidates, int target) {
+        std::sort(candidates.begin(), candidates.end());
+
+        std::vector<std::vector<int>> result;
+        std::vector<int> curr;
+
+        dfs(result, 0, target, curr, candidates);
+        return result;
+    }
+    void print(const std::vector<std::vector<int>>& out) {
+        std::cout << "[";
+        for (int i = 0; i < out.size(); i++)
+        {
+            std::cout << "[";
+            for (int j = 0; j < out[i].size(); j++)
+            {
+                std::cout << out[i][j] << " ";
+            }
+            std::cout << "]";
+        }
+        std::cout << "]\n";
+    }
+    void example() {
+        std::vector<int> in = { 10,1,2,7,6,1,5 };
+        int target = 8;
+        print(combinationSum2(in, target));
+    }
+}
+//79. Word Search
+namespace BacktrackingWordSearch {
+    //(BETTER)SOLUTION
+    bool dfs(std::vector<std::vector<char>>& board, std::string word,
+        int index, int i, int j, int m, int n) {
+
+        if (i < 0 || i >= m || j < 0 || j >= n || board[i][j] != word[index]) {
+            return false;
+        }
+        if (index == word.size() - 1) {
+            return true;
+        }
+
+        board[i][j] = '#';
+
+        if (dfs(board, word, index + 1, i - 1, j, m, n)
+            || dfs(board, word, index + 1, i + 1, j, m, n)
+            || dfs(board, word, index + 1, i, j - 1, m, n)
+            || dfs(board, word, index + 1, i, j + 1, m, n)) {
+            return true;
+        }
+
+        board[i][j] = word[index];
+        return false;
+    }
+    bool exist2(std::vector<std::vector<char>>& board, std::string word) {
+        int m = board.size();
+        int n = board[0].size();
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (board[i][j] == word[0]) {
+                    if (dfs(board, word, 0, i, j, m, n)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+    //FIRST SOLUTION
+    void helper(std::vector<std::vector<char>>& board, int rowIdx, int colIdx, std::string& word, int letterIdx, bool& result, std::vector<std::vector<char>>& markedTiles){// dir direction) {
+        if (letterIdx == word.length())
+        {
+            result = true;
+            return;
+        }
+        if (board[rowIdx][colIdx] == word[letterIdx])
+        {
+            bool didItEnd = true;
+            if ((rowIdx < board.size() - 1) && (markedTiles[rowIdx+1][colIdx] =='_'))
+            {
+                didItEnd = false;
+                markedTiles[rowIdx + 1][colIdx] = 'm';
+                helper(board, rowIdx + 1, colIdx, word, letterIdx + 1, result, markedTiles);
+                markedTiles[rowIdx + 1][colIdx] = '_';
+            }
+            if ((colIdx < board[0].size() - 1) && (markedTiles[rowIdx][colIdx+1] == '_'))
+            {
+                didItEnd = false;
+                markedTiles[rowIdx][colIdx + 1] = 'm';
+                helper(board, rowIdx, colIdx + 1, word, letterIdx + 1, result, markedTiles);
+                markedTiles[rowIdx][colIdx + 1] = '_';
+            }
+            if ((colIdx > 0) && (markedTiles[rowIdx][colIdx-1] == '_'))
+            {
+                didItEnd = false;
+                markedTiles[rowIdx][colIdx - 1] = 'm';
+                helper(board, rowIdx, colIdx - 1, word, letterIdx + 1, result, markedTiles);
+                markedTiles[rowIdx][colIdx - 1] = '_';
+            }
+            if ((rowIdx > 0) && (markedTiles[rowIdx- 1][colIdx] == '_'))
+            {
+                didItEnd = false;
+                markedTiles[rowIdx - 1][colIdx] = 'm';
+                helper(board, rowIdx - 1, colIdx, word, letterIdx + 1, result, markedTiles);
+                markedTiles[rowIdx - 1][colIdx] = '_';
+            }
+            if (didItEnd && (letterIdx + 1 == word.length()))
+                result = true;
+        }
+    }
+
+    bool exist(std::vector<std::vector<char>>& board, std::string word) {
+        bool result = false;
+        int letterIdx = 0;
+        for (int i = 0; (i < board.size()); i++) {
+            for (int j = 0; (j < board[0].size()); j++) {
+                if (word[letterIdx] == board[i][j])
+                {
+                    std::vector<std::vector<char>> markedTiles(board.size(), std::vector<char>(board[0].size(), '_'));
+                    markedTiles[i][j] = 'm';
+                    helper(board, i, j, word, 0, result, markedTiles);
+                    if (result) return true;
+                    if ((board.size() == 1) && (board[0].size() == 1) && (word.length() == 1)) return true;
+                }
+
+            }
+        }
+        return false;
+    }
+    void print(bool out) {
+        std::cout << (out ? "true" : "false") << "\n";
+    }
+    void example() {
+        std::vector<std::vector<char>> in = { {'a','a','a','a'}, {'a','a','a','a'} ,{'a','a','a','a'} };
+        std::string word = "aaaaaaaaaaaaa";
+        print(exist(in, word));
+        print(exist2(in, word));
+    }
+}
 int main(){
     /*GroupAnagrams::example();
     TopKFrequent::example();
@@ -887,8 +1088,11 @@ int main(){
     BinaryTreeRightSideView::example();
     BinaryTreeCountGoodNodes::example();
     ValidateBST::example();
-    BSTKthSmallestElement::example();
-    BacktrackingSubsets::example();
-    BacktrackingCombinationSum::example();*/
-    BacktrackingPermutations::example();
+    BSTKthSmallestElement::example();*/
+    //BacktrackingSubsets::example();
+    /*BacktrackingCombinationSum::example();
+    BacktrackingPermutations::example();*/
+    //BacktrackingSubsets2::example();
+    //BacktrackingCombinationSum2::example();
+    BacktrackingWordSearch::example();
 }
