@@ -1073,6 +1073,57 @@ namespace BacktrackingWordSearch {
         print(exist2(in, word));
     }
 }
+//131. Palindrome Partitioning
+namespace BacktrackingPalindrome {
+    bool isPalindrome(const std::string& s, int start, int end) {
+        while (start < end) {
+            if (s[start] != s[end]) {
+                return false;
+            }
+            start++;
+            end--;
+        }
+        return true;
+    }
+    void dfs(const std::string& s, int start, std::vector<std::string>& curr, std::vector<std::vector<std::string>>& result) {
+        if (start == s.size()) {
+            result.push_back(curr);
+            return;
+        }
+
+        for (int i = start; i < s.size(); i++)
+        {
+            if (isPalindrome(s, start, i)) {
+                curr.push_back(s.substr(start, i - start + 1));
+                dfs(s, i+1, curr, result);
+                curr.pop_back();
+            }
+        }
+    }
+    std::vector<std::vector<std::string>> partition(std::string s) {
+        std::vector<std::vector<std::string>> result;
+        std::vector<std::string> curr;
+        dfs(s, 0, curr, result);
+        return result;
+    }
+    void print(std::vector<std::vector<std::string>> out) {
+        std::cout << "[";
+        for (int i = 0; i < out.size(); i++)
+        {
+            std::cout << "[";
+            for (int j = 0; j < out[i].size(); j++)
+            {
+                std::cout << out[i][j] << " ";
+            }
+            std::cout << "]";
+        }
+        std::cout << "]\n";
+    }
+    void example() {
+        std::string in = "aab";
+        print(partition(in));
+    }
+}
 int main(){
     /*GroupAnagrams::example();
     TopKFrequent::example();
@@ -1088,11 +1139,12 @@ int main(){
     BinaryTreeRightSideView::example();
     BinaryTreeCountGoodNodes::example();
     ValidateBST::example();
-    BSTKthSmallestElement::example();*/
-    //BacktrackingSubsets::example();
-    /*BacktrackingCombinationSum::example();
-    BacktrackingPermutations::example();*/
-    //BacktrackingSubsets2::example();
-    //BacktrackingCombinationSum2::example();
-    BacktrackingWordSearch::example();
+    BSTKthSmallestElement::example();
+    BacktrackingSubsets::example();
+    BacktrackingCombinationSum::example();
+    BacktrackingPermutations::example();
+    BacktrackingSubsets2::example();
+    BacktrackingCombinationSum2::example();
+    BacktrackingWordSearch::example();*/
+    BacktrackingPalindrome::example();
 }
