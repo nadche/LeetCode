@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <unordered_map>
+#include <unordered_set>
 #include <queue>
 #include <math.h>
 #include <string>
@@ -1124,6 +1125,106 @@ namespace BacktrackingPalindrome {
         print(partition(in));
     }
 }
+//17. Letter Combinations of a Phone Number
+namespace BacktrackingPhoneNumber {
+    void dfs(const std::string& digits, std::string& str, int start, std::unordered_map<char, std::string>& m, std::vector<std::string>& result) {
+        if (str.length() == digits.length())
+        {
+            result.push_back(str);
+            return;
+        }
+        std::string map = m[digits[start]];
+        for (int i = 0; i < map.length(); i++) {
+            str.push_back(map[i]);
+            dfs(digits, str, start + 1, m, result);
+            str.pop_back();
+        }
+    }
+
+    std::vector<std::string> letterCombinations(std::string digits) {
+        if (digits == "") return {};
+        std::unordered_map<char, std::string> m = {
+            {'2', "abc"},
+            {'3', "def"},
+            {'4', "ghi"},
+            {'5', "jkl"},
+            {'6', "mno"},
+            {'7', "pqrs"},
+            {'8', "tuv"},
+            {'9', "wxyz"}
+        };
+        std::vector<std::string> result;
+        std::string str = "";
+        dfs(digits, str, 0, m, result);
+        return result;
+        }
+    void print(const std::vector<std::string>& out) {
+        std::cout << "[";
+        for (int j = 0; j < out.size(); j++)
+        {
+            std::cout<< out[j] << " ";
+        }
+        std::cout << "]";
+    }
+    void example() {
+        std::string in = "23";
+        print(letterCombinations(in));
+    }
+}
+//51. N-Queens
+namespace BacktrackingNQueens {
+    void dfs(int n, int row, std::unordered_set<int>& cols, std::unordered_set<int>& negDiag,
+        std::unordered_set<int>& posDiag, std::vector<std::string>& board, std::vector<std::vector<std::string>>& result) {
+        if (row == n) {
+            result.push_back(board);
+            return;
+        }
+        for (int col = 0; col < n; col++) {
+            if (cols.find(col) != cols.end() ||
+                negDiag.find(row - col) != negDiag.end() ||
+                posDiag.find(row + col) != posDiag.end())
+                continue;
+            
+            cols.insert(col);
+            negDiag.insert(row - col);
+            posDiag.insert(row + col);
+            board[row][col] = 'Q';
+            dfs(n, row + 1, cols, negDiag, posDiag, board, result);
+            cols.erase(col);
+            negDiag.erase(row - col);
+            posDiag.erase(row + col);
+            board[row][col] = '.';
+        }
+    }
+
+    std::vector<std::vector<std::string>> solveNQueens(int n) {
+        std::vector<std::vector<std::string>> result;
+        std::vector<std::string> board(n, std::string(n, '.'));
+        std::unordered_set<int> cols;
+        std::unordered_set<int> negDiag;
+        std::unordered_set<int> posDiag;
+        dfs(n, 0, cols, negDiag, posDiag, board, result);
+        return result;
+
+    }
+    void print(const std::vector<std::vector<std::string>>& out) {
+        std::cout << "[";
+        for (int i = 0; i< out.size(); i++)
+        {
+            std::cout << "[";
+            for (int j = 0; j < out[0].size(); j++)
+            {
+                std::cout << out[i][j];
+            }
+            std::cout << "]\n";
+        }
+        std::cout << "]\n";
+    }
+    void example() {
+        int in = 6;
+        print(solveNQueens(in));
+    }
+}
 int main(){
     /*GroupAnagrams::example();
     TopKFrequent::example();
@@ -1145,6 +1246,8 @@ int main(){
     BacktrackingPermutations::example();
     BacktrackingSubsets2::example();
     BacktrackingCombinationSum2::example();
-    BacktrackingWordSearch::example();*/
+    BacktrackingWordSearch::example();
     BacktrackingPalindrome::example();
+    BacktrackingPhoneNumber::example();*/
+    BacktrackingNQueens::example();
 }
